@@ -10,5 +10,14 @@ enum class CodigoHttp(val codigo: Int) {
   NOT_FOUND(404),
 }
 
+class ServidorWeb {
+  fun recibirPedido(pedido: Pedido): Respuesta {
+    return if (!pedido.url.startsWith("http:")) {
+      Respuesta(codigo = CodigoHttp.NOT_IMPLEMENTED, body = "", tiempo = 10, pedido = pedido)
+    } else Respuesta(codigo = CodigoHttp.OK, body = "", tiempo = 10, pedido = pedido)
+  }
+
+}
+
 class Pedido(val ip: String, val url: String, val fechaHora: LocalDateTime)
 class Respuesta(val codigo: CodigoHttp, val body: String, val tiempo: Int, val pedido: Pedido)
