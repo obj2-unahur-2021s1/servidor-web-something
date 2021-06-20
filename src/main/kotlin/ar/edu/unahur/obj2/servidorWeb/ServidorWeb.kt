@@ -3,7 +3,6 @@ package ar.edu.unahur.obj2.servidorWeb
 import java.time.LocalDateTime
 import java.net.URL
 
-
 // Para no tener los códigos "tirados por ahí", usamos un enum que le da el nombre que corresponde a cada código
 // La idea de las clases enumeradas es usar directamente sus objetos: CodigoHTTP.OK, CodigoHTTP.NOT_IMPLEMENTED, etc
 enum class CodigoHttp(val codigo: Int) {
@@ -14,18 +13,28 @@ enum class CodigoHttp(val codigo: Int) {
 
 class ServidorWeb {
   val modulosIntegrados = mutableListOf<Modulo>()
+  val analizadoresIntegrados = mutableListOf<Analizador>()
 
   fun agregarModulo(modulo: Modulo) = modulosIntegrados.add(modulo)
+
+  fun agregarAnalizador(analizador: Analizador) = analizadoresIntegrados.add(analizador)
 
   fun pedidoAceptado(pedido: Pedido) = pedido.protocolo() == "http"
 
   fun extensionSoportada(extension: String) =
     modulosIntegrados.any { it.extensiones.contains(extension) }
 
+  fun procesarAnalizador(respuesta: Respuesta, modulo: Modulo) {
+    if (analizadoresIntegrados.isNotEmpty())
+      this.analizadoresIntegrados.forEach { it.analizar(respuesta, modulo) }
+  }
+
   fun recibirPedido(pedido: Pedido): Respuesta {
     return if (pedidoAceptado(pedido) && extensionSoportada(pedido.extension())) {
       val modulo = modulosIntegrados.first { it.extensiones.contains(pedido.extension()) }
-      Respuesta( CodigoHttp.OK, modulo.respuestaModulo, modulo.tiempoRespuestaModulo, pedido)
+      val respuesta = Respuesta(CodigoHttp.OK, modulo.respuestaModulo, modulo.tiempoRespuestaModulo, pedido)
+      procesarAnalizador(respuesta, modulo)
+      respuesta
       } else if (!pedidoAceptado(pedido)) {
         Respuesta(CodigoHttp.NOT_IMPLEMENTED, "", 10, pedido)
       } else {
@@ -42,6 +51,6 @@ class Pedido(val ip: String, val url: URL, val fechaHora: LocalDateTime) {
 
 class Respuesta(val codigo: CodigoHttp, val body: String, val tiempo: Int, val pedido: Pedido)
 
-
-class Modulo (
-  val extensiones: Set<String>, val respuestaModulo: String, val tiempoRespuestaModulo : Int)
+class Modulo(val extensiones: Set<String>, val respuestaModulo: String, val tiempoRespuestaModulo: Int) {
+  val respuestasDemoradas = mutableListOf<Respuesta>()
+}
