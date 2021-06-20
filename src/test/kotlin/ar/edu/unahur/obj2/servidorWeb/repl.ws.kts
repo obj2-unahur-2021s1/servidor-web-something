@@ -1,4 +1,6 @@
 import java.net.URL
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 // Pueden usar este archivo para hacer pruebas rápidas,
 // de la misma forma en que usaban el REPL de Wollok.
@@ -18,4 +20,7 @@ url.file
 
 dir.substringAfterLast(".")
 
+val lista = listOf(1,2,3,2,4,2,4)
+
+LocalDateTime.now()
 

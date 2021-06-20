@@ -22,8 +22,8 @@ class AnalizadorDeIPsSospechosas(val ipsSospechosas: MutableSet<String>): Analiz
     override fun analizar(respuesta: Respuesta, modulo: Modulo) {
         if (ipsSospechosas.contains(respuesta.pedido.ip)) {
             pedidosSospechosos.add(respuesta.pedido)
+            modulos.add(modulo)
         }
-        modulos.add(modulo)
     }
 
     fun cantDePedidosHechosPor(ip: String) = pedidosSospechosos.count { it.ip == ip }
@@ -46,7 +46,7 @@ class AnalizadorDeEstadisticas: Analizador() {
         this.respuestasAPedidos().filter { it.fechaHora.isAfter(primerMomento) &&
                 it.fechaHora.isBefore(segundoMomento) }.size
 
-    fun cantDeRespuestasQueIncluyen(string: String) = respuestasPorAnalizar.filter { it.body.contains(string) }.size
+    fun cantDeRespuestasQueIncluyen(string: String) = respuestasPorAnalizar.filter { it.body.contains(string, ignoreCase = true) }.size
 
     fun porcentajeDePedidosExitosos() = this.respuestasExitosas().size / respuestasPorAnalizar.size * 100
 
