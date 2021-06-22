@@ -70,9 +70,9 @@ class ServidorWebTest : DescribeSpec({
         it("cantidad de pedidos de una ip (3)") {
           analizadorIp.cantDePedidosHechosPor("102.20.20.0").shouldBe(3)
         }
-        /*it("modulo mas consultado por ips sospechosas (imagen)") {
+        it("modulo mas consultado por ips sospechosas (imagen)") {
           analizadorIp.moduloMasConsultado().shouldBe(moduloImagen)
-        }*/
+        }
         it("ips que que solicitaron ruta (/hola.jpg)") {
           analizadorIp.ipsQueRequirieron("/hola.jpg").shouldBe(setOf("102.20.20.0", "102.46.81.0"))
         }
@@ -90,10 +90,9 @@ class ServidorWebTest : DescribeSpec({
         it("cantidad de respuestas con body Imagen (3)") {
           analizadorEst.cantDeRespuestasQueIncluyen("imagen").shouldBe(3)
         }
-        /*it("porcentaje de pedidos exitosos cod:200 en Int (66,6)") {
-          // probar post modificacion
+        it("porcentaje de pedidos exitosos cod:200 en Int (66,6)") {
           analizadorEst.porcentajeDePedidosExitosos().shouldBe(66)
-        }*/
+        }
       }
     }
   }

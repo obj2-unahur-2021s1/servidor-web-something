@@ -20,7 +20,13 @@ url.file
 
 dir.substringAfterLast(".")
 
-val lista = listOf(1,2,3,2,4,2,4)
+val lista = mutableListOf<Int?>(1,2,3,2,4,2,4)
 
 LocalDateTime.now()
+
+lista.add(null)
+lista
+lista.contains(null)
+
+lista.filterNotNull()
 

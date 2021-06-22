@@ -22,28 +22,22 @@ class ServidorWeb {
   fun extensionSoportada(extension: String) =
     modulosIntegrados.any { it.extensiones.contains(extension) }
 
-  fun procesarAnalizador(respuesta: Respuesta, modulo: Modulo?) {
+  fun procesarAnalizador(respuesta: Respuesta, modulo: Modulo? = null) {
     if (analizadoresIntegrados.isNotEmpty())
       this.analizadoresIntegrados.forEach { it.analizar(respuesta, modulo) }
   }
 
   fun recibirPedido(pedido: Pedido): Respuesta {
-    return if (pedidoAceptado(pedido) && extensionSoportada(pedido.extension())) {
-      val modulo = modulosIntegrados.first { it.extensiones.contains(pedido.extension()) }
-      val respuesta = Respuesta(CodigoHttp.OK, modulo.respuestaModulo, modulo.tiempoRespuestaModulo, pedido)
-      procesarAnalizador(respuesta, modulo)
-      respuesta
-      } else if (!pedidoAceptado(pedido)) {
-        val modulo = null
-        val respuesta = Respuesta(CodigoHttp.NOT_IMPLEMENTED, "", 10, pedido)
-        procesarAnalizador(respuesta, modulo)
-        respuesta
-        } else {
-        val modulo = null
-        val respuesta = Respuesta(CodigoHttp.NOT_FOUND, "", 10, pedido)
-        procesarAnalizador(respuesta,modulo)
-        respuesta
-          }
+    var modulo : Modulo? = null
+    var respuesta = Respuesta(CodigoHttp.NOT_IMPLEMENTED, "", 10, pedido)
+    if (!extensionSoportada(pedido.extension())) {
+        respuesta = Respuesta(CodigoHttp.NOT_FOUND, "", 10, pedido)
+    } else if (pedidoAceptado(pedido) && extensionSoportada(pedido.extension())) {
+      modulo = modulosIntegrados.first { it.extensiones.contains(pedido.extension()) }
+      respuesta = Respuesta(CodigoHttp.OK, modulo.respuestaModulo, modulo.tiempoRespuestaModulo, pedido)
+      }
+    procesarAnalizador(respuesta, modulo)
+    return respuesta
   }
 }
 

@@ -17,13 +17,12 @@ class AnalizadorDeDemoraEnRespuesta(val demoraMinima: Int): Analizador() {
 
 class AnalizadorDeIPsSospechosas(val ipsSospechosas: MutableSet<String>): Analizador() {
     val pedidosSospechosos = mutableListOf<Pedido>()
-    val modulos = mutableListOf<Modulo>()
+    val modulos = mutableListOf<Modulo?>()
 
     override fun analizar(respuesta: Respuesta, modulo: Modulo?) {
         if (ipsSospechosas.contains(respuesta.pedido.ip)) {
             pedidosSospechosos.add(respuesta.pedido)
-        } else {
-            modulos.add(modulo!!)
+            modulos.add(modulo)
         }
     }
 
@@ -50,7 +49,7 @@ class AnalizadorDeEstadisticas: Analizador() {
     fun cantDeRespuestasQueIncluyen(string: String) =
         respuestasPorAnalizar.filter { it.body.contains(string, ignoreCase = true) }.size
 
-    fun porcentajeDePedidosExitosos() = respuestasExitosas().size / (respuestasPorAnalizar.size * 100)
+    fun porcentajeDePedidosExitosos() = ((respuestasExitosas().size.toFloat() / respuestasPorAnalizar.size.toFloat()) * 100).toInt()
 
     fun respuestasExitosas() = respuestasPorAnalizar.filter { it.codigo == CodigoHttp.OK }
 
