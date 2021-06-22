@@ -3,8 +3,6 @@ package ar.edu.unahur.obj2.servidorWeb
 import java.time.LocalDateTime
 import java.net.URL
 
-// Para no tener los códigos "tirados por ahí", usamos un enum que le da el nombre que corresponde a cada código
-// La idea de las clases enumeradas es usar directamente sus objetos: CodigoHTTP.OK, CodigoHTTP.NOT_IMPLEMENTED, etc
 enum class CodigoHttp(val codigo: Int) {
   OK(200),
   NOT_IMPLEMENTED(501),
@@ -24,7 +22,7 @@ class ServidorWeb {
   fun extensionSoportada(extension: String) =
     modulosIntegrados.any { it.extensiones.contains(extension) }
 
-  fun procesarAnalizador(respuesta: Respuesta, modulo: Modulo) {
+  fun procesarAnalizador(respuesta: Respuesta, modulo: Modulo?) {
     if (analizadoresIntegrados.isNotEmpty())
       this.analizadoresIntegrados.forEach { it.analizar(respuesta, modulo) }
   }
@@ -36,10 +34,16 @@ class ServidorWeb {
       procesarAnalizador(respuesta, modulo)
       respuesta
       } else if (!pedidoAceptado(pedido)) {
-        Respuesta(CodigoHttp.NOT_IMPLEMENTED, "", 10, pedido)
-      } else {
-        Respuesta(CodigoHttp.NOT_FOUND, "", 10, pedido)
-    }
+        val modulo = null
+        val respuesta = Respuesta(CodigoHttp.NOT_IMPLEMENTED, "", 10, pedido)
+        procesarAnalizador(respuesta, modulo)
+        respuesta
+        } else {
+        val modulo = null
+        val respuesta = Respuesta(CodigoHttp.NOT_FOUND, "", 10, pedido)
+        procesarAnalizador(respuesta,modulo)
+        respuesta
+          }
   }
 }
 

@@ -3,13 +3,13 @@ package ar.edu.unahur.obj2.servidorWeb
 import java.time.LocalDateTime
 
 abstract class Analizador {
-    abstract fun analizar(respuesta: Respuesta, modulo: Modulo)
+    abstract fun analizar(respuesta: Respuesta, modulo: Modulo?)
 }
 
 class AnalizadorDeDemoraEnRespuesta(val demoraMinima: Int): Analizador() {
-    override fun analizar(respuesta: Respuesta, modulo: Modulo) {
+    override fun analizar(respuesta: Respuesta, modulo: Modulo?) {
         if (respuesta.tiempo > demoraMinima)
-            modulo.respuestasDemoradas.add(respuesta)
+            modulo?.respuestasDemoradas?.add(respuesta)
     }
 
     fun cantDeRespuestasDemoradas(modulo: Modulo) = modulo.respuestasDemoradas.size
@@ -19,10 +19,11 @@ class AnalizadorDeIPsSospechosas(val ipsSospechosas: MutableSet<String>): Analiz
     val pedidosSospechosos = mutableListOf<Pedido>()
     val modulos = mutableListOf<Modulo>()
 
-    override fun analizar(respuesta: Respuesta, modulo: Modulo) {
+    override fun analizar(respuesta: Respuesta, modulo: Modulo?) {
         if (ipsSospechosas.contains(respuesta.pedido.ip)) {
             pedidosSospechosos.add(respuesta.pedido)
-            modulos.add(modulo)
+        } else {
+            modulos.add(modulo!!)
         }
     }
 
@@ -36,7 +37,7 @@ class AnalizadorDeIPsSospechosas(val ipsSospechosas: MutableSet<String>): Analiz
 class AnalizadorDeEstadisticas: Analizador() {
     val respuestasPorAnalizar = mutableListOf<Respuesta>()
 
-    override fun analizar(respuesta: Respuesta, modulo: Modulo) {
+    override fun analizar(respuesta: Respuesta, modulo: Modulo?) {
         respuestasPorAnalizar.add(respuesta)
     }
 
@@ -46,9 +47,10 @@ class AnalizadorDeEstadisticas: Analizador() {
         this.respuestasAPedidos().filter { it.fechaHora.isAfter(primerMomento) &&
                 it.fechaHora.isBefore(segundoMomento) }.size
 
-    fun cantDeRespuestasQueIncluyen(string: String) = respuestasPorAnalizar.filter { it.body.contains(string, ignoreCase = true) }.size
+    fun cantDeRespuestasQueIncluyen(string: String) =
+        respuestasPorAnalizar.filter { it.body.contains(string, ignoreCase = true) }.size
 
-    fun porcentajeDePedidosExitosos() = this.respuestasExitosas().size / respuestasPorAnalizar.size * 100
+    fun porcentajeDePedidosExitosos() = respuestasExitosas().size / (respuestasPorAnalizar.size * 100)
 
     fun respuestasExitosas() = respuestasPorAnalizar.filter { it.codigo == CodigoHttp.OK }
 
